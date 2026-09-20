@@ -20,7 +20,6 @@
             --gold-light: #F5E6B8;
             --gold-cream: #FDF8EC;
             --gold-glow: rgba(212, 175, 55, 0.15);
-            --gold-glow-strong: rgba(212, 175, 55, 0.3);
             --text-primary: #2C2C2C;
             --text-secondary: #6B6B6B;
             --text-muted: #9A9A9A;
@@ -30,6 +29,7 @@
             --shadow-gold: 0 8px 32px rgba(212, 175, 55, 0.08), 0 2px 8px rgba(212, 175, 55, 0.04);
             --shadow-gold-hover: 0 12px 48px rgba(212, 175, 55, 0.15), 0 4px 12px rgba(212, 175, 55, 0.08);
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --sidebar-width: 300px;
         }
 
         html, body {
@@ -43,7 +43,6 @@
             background-color: var(--bg-main);
             color: var(--text-primary);
             display: flex;
-            flex-direction: column;
             position: fixed;
             top: 0;
             left: 0;
@@ -65,6 +64,293 @@
             z-index: 0;
         }
 
+        /* ===== SIDEBAR ===== */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(44, 44, 44, 0.35);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 50;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            max-width: 85vw;
+            height: 100%;
+            background: var(--bg-card);
+            border-right: 1px solid rgba(212, 175, 55, 0.15);
+            box-shadow: 4px 0 24px rgba(212, 175, 55, 0.08);
+            z-index: 60;
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+        }
+
+        .sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .sidebar-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sidebar-title svg {
+            width: 18px;
+            height: 18px;
+            fill: var(--gold-primary);
+        }
+
+        .sidebar-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .sidebar-close:hover {
+            background: var(--gold-cream);
+            color: var(--gold-secondary);
+        }
+
+        .sidebar-close svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .new-chat-btn {
+            margin: 12px 16px;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            background: var(--gold-cream);
+            color: var(--gold-secondary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .new-chat-btn:hover {
+            background: var(--gold-light);
+            border-color: var(--gold-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.15);
+        }
+
+        .new-chat-btn:active {
+            transform: scale(0.98);
+        }
+
+        .new-chat-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        .chats-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 8px;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .chats-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .chats-list::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+        }
+
+        .chats-list-label {
+            padding: 8px 10px 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chat-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-bottom: 2px;
+            position: relative;
+        }
+
+        .chat-item:hover {
+            background: var(--gold-cream);
+        }
+
+        .chat-item.active {
+            background: var(--gold-cream);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .chat-item-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 8px;
+            background: rgba(212, 175, 55, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .chat-item-icon svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--gold-secondary);
+        }
+
+        .chat-item-title {
+            flex: 1;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            min-width: 0;
+        }
+
+        .chat-item-delete {
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .chat-item:hover .chat-item-delete {
+            opacity: 1;
+        }
+
+        .chat-item-delete:hover {
+            background: #FFF5F5;
+            color: #B85454;
+        }
+
+        .chat-item-delete svg {
+            width: 13px;
+            height: 13px;
+        }
+
+        .chats-empty {
+            padding: 24px 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            line-height: 1.5;
+        }
+
+        .sidebar-footer {
+            padding: 12px 16px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            flex-shrink: 0;
+        }
+
+        .settings-btn {
+            width: 100%;
+            padding: 11px 16px;
+            border-radius: var(--radius-sm);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .settings-btn:hover {
+            background: var(--gold-cream);
+            border-color: var(--gold-primary);
+        }
+
+        .settings-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: var(--gold-secondary);
+        }
+
+        .settings-btn-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .settings-btn-label {
+            display: block;
+            font-weight: 500;
+        }
+
+        .settings-btn-status {
+            display: block;
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 400;
+            margin-top: 1px;
+        }
+
+        /* ===== MAIN CHAT CONTAINER ===== */
         .chat-container {
             position: relative;
             z-index: 1;
@@ -88,7 +374,7 @@
             gap: 8px;
         }
 
-        .logo {
+        .header-left {
             display: flex;
             align-items: center;
             gap: 10px;
@@ -96,58 +382,9 @@
             flex: 1;
         }
 
-        .logo-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-            flex-shrink: 0;
-        }
-
-        .logo-icon svg {
-            width: 20px;
-            height: 20px;
-            fill: white;
-        }
-
-        .logo-text {
-            font-size: 1.2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.5px;
-            white-space: nowrap;
-        }
-
-        .logo-badge {
-            font-size: 0.6rem;
-            font-weight: 500;
-            color: var(--gold-secondary);
-            background: var(--gold-cream);
-            border: 1px solid rgba(212, 175, 55, 0.2);
-            padding: 2px 6px;
-            border-radius: 20px;
-            letter-spacing: 0.5px;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            flex-shrink: 0;
-        }
-
-        .icon-btn {
-            width: 36px;
-            height: 36px;
+        .menu-btn {
+            width: 38px;
+            height: 38px;
             border-radius: 10px;
             border: 1px solid rgba(212, 175, 55, 0.2);
             background: var(--bg-card);
@@ -160,19 +397,75 @@
             flex-shrink: 0;
         }
 
-        .icon-btn:hover {
+        .menu-btn:hover {
             background: var(--gold-cream);
             border-color: var(--gold-primary);
         }
 
-        .icon-btn:active {
+        .menu-btn:active {
             transform: scale(0.95);
         }
 
-        .icon-btn svg {
-            width: 16px;
-            height: 16px;
+        .menu-btn svg {
+            width: 18px;
+            height: 18px;
             fill: currentColor;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .logo-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+            flex-shrink: 0;
+        }
+
+        .logo-icon svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-size: 1.15rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+        }
+
+        .logo-badge {
+            font-size: 0.58rem;
+            font-weight: 500;
+            color: var(--gold-secondary);
+            background: var(--gold-cream);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 2px 6px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-shrink: 0;
         }
 
         .api-status {
@@ -393,34 +686,17 @@
             animation: bounce 1.4s ease-in-out infinite;
         }
 
-        .typing-dots span:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .typing-dots span:nth-child(3) {
-            animation-delay: 0.4s;
-        }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes bounce {
-            0%, 60%, 100% {
-                transform: translateY(0);
-                opacity: 0.4;
-            }
-            30% {
-                transform: translateY(-6px);
-                opacity: 1;
-            }
+            0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+            30% { transform: translateY(-6px); opacity: 1; }
         }
 
         @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* Input Area */
@@ -504,10 +780,9 @@
             width: 16px;
             height: 16px;
             fill: white;
-            transition: var(--transition);
         }
 
-        /* Settings Modal */
+        /* ===== SETTINGS MODAL ===== */
         .modal-overlay {
             position: fixed;
             inset: 0;
@@ -517,7 +792,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 100;
+            z-index: 200;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s ease;
@@ -692,7 +967,7 @@
             background: #FFF5F5;
         }
 
-        /* Desktop styles */
+        /* ===== DESKTOP ===== */
         @media (min-width: 768px) {
             body {
                 align-items: center;
@@ -715,133 +990,82 @@
             }
 
             .chat-header {
-                padding: 20px 28px;
+                padding: 16px 24px;
             }
 
-            .logo {
-                gap: 12px;
+            .menu-btn {
+                width: 40px;
+                height: 40px;
             }
 
             .logo-icon {
-                width: 40px;
-                height: 40px;
-                border-radius: 12px;
-            }
-
-            .logo-icon svg {
-                width: 22px;
-                height: 22px;
-            }
-
-            .logo-text {
-                font-size: 1.4rem;
-            }
-
-            .logo-badge {
-                font-size: 0.65rem;
-                padding: 3px 8px;
-            }
-
-            .header-actions {
-                gap: 8px;
-            }
-
-            .icon-btn {
                 width: 38px;
                 height: 38px;
             }
 
-            .icon-btn svg {
-                width: 18px;
-                height: 18px;
+            .logo-icon svg {
+                width: 20px;
+                height: 20px;
+            }
+
+            .logo-text {
+                font-size: 1.3rem;
+            }
+
+            .logo-badge {
+                font-size: 0.62rem;
+                padding: 3px 8px;
             }
 
             .api-status {
                 padding: 6px 12px;
                 font-size: 0.75rem;
-                gap: 6px;
-            }
-
-            .api-status-dot {
-                width: 7px;
-                height: 7px;
             }
 
             .chat-messages {
-                padding: 28px 24px;
-                gap: 16px;
+                padding: 24px 20px;
+                gap: 14px;
             }
 
             .welcome-message {
-                padding: 40px 20px;
+                padding: 36px 20px;
             }
 
             .welcome-message h2 {
-                font-size: 1.5rem;
+                font-size: 1.45rem;
             }
 
             .welcome-message p {
                 font-size: 0.95rem;
             }
 
-            .welcome-message .hint {
-                font-size: 0.85rem;
-                padding: 12px 16px;
-            }
-
             .message {
-                gap: 12px;
+                gap: 10px;
                 max-width: 85%;
             }
 
             .message-avatar {
-                width: 34px;
-                height: 34px;
-                border-radius: 10px;
-                font-size: 0.75rem;
+                width: 32px;
+                height: 32px;
             }
 
             .message-content {
-                padding: 14px 18px;
+                padding: 12px 16px;
                 font-size: 0.92rem;
             }
 
-            .message-content pre {
-                padding: 16px;
-            }
-
-            .message-content code {
-                font-size: 0.82rem;
-            }
-
-            .message-content p code {
-                font-size: 0.84rem;
-                padding: 2px 7px;
-            }
-
-            .typing-dots {
-                padding: 16px 20px;
-                gap: 5px;
-            }
-
-            .typing-dots span {
-                width: 8px;
-                height: 8px;
-            }
-
             .chat-input-area {
-                padding: 20px 24px;
-                padding-bottom: 20px;
+                padding: 16px 20px;
+                padding-bottom: 16px;
             }
 
             .input-wrapper {
-                padding: 6px 6px 6px 18px;
-                gap: 12px;
+                padding: 5px 5px 5px 16px;
+                gap: 10px;
             }
 
             .chat-input {
                 font-size: 0.93rem;
-                padding: 10px 0;
             }
 
             .send-btn {
@@ -854,51 +1078,30 @@
                 height: 18px;
             }
 
+            .sidebar {
+                box-shadow: 4px 0 32px rgba(212, 175, 55, 0.12);
+            }
+
             .modal-overlay {
                 padding: 20px;
             }
 
             .modal-header {
-                padding: 24px 28px 16px;
-            }
-
-            .modal-header h3 {
-                font-size: 1.2rem;
+                padding: 22px 26px 16px;
             }
 
             .modal-body {
-                padding: 24px 28px;
-                gap: 20px;
-            }
-
-            .form-label {
-                font-size: 0.85rem;
-            }
-
-            .form-hint {
-                font-size: 0.78rem;
-            }
-
-            .form-input, .form-select {
-                padding: 12px 14px;
-                font-size: 0.9rem;
+                padding: 22px 26px;
             }
 
             .modal-footer {
-                padding: 16px 28px 24px;
-                gap: 10px;
-            }
-
-            .btn {
-                padding: 10px 20px;
-                font-size: 0.9rem;
+                padding: 16px 26px 22px;
             }
         }
 
-        /* Small mobile screens */
         @media (max-width: 380px) {
             .logo-text {
-                font-size: 1.1rem;
+                font-size: 1.05rem;
             }
 
             .logo-badge {
@@ -920,38 +1123,75 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">
+                <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                IncludeAI
+            </div>
+            <button class="sidebar-close" id="sidebarClose" title="Закрыть">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+
+        <button class="new-chat-btn" id="newChatBtn">
+            <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Новый чат
+        </button>
+
+        <div class="chats-list" id="chatsList">
+            <div class="chats-list-label">История чатов</div>
+            <div class="chats-empty" id="chatsEmpty">Пока нет сохранённых чатов</div>
+        </div>
+
+        <div class="sidebar-footer">
+            <button class="settings-btn" id="settingsBtn">
+                <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+                <div class="settings-btn-info">
+                    <span class="settings-btn-label">Настройки</span>
+                    <span class="settings-btn-status" id="settingsStatus">API не подключён</span>
+                </div>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Chat -->
     <div class="chat-container">
         <!-- Header -->
         <div class="chat-header">
-            <div class="logo">
-                <div class="logo-icon">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
-                    </svg>
+            <div class="header-left">
+                <button class="menu-btn" id="menuBtn" title="Меню">
+                    <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+                </button>
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    </div>
+                    <span class="logo-text">IncludeAI</span>
+                    <span class="logo-badge">Beta</span>
                 </div>
-                <span class="logo-text">IncludeAI</span>
-                <span class="logo-badge">Beta</span>
             </div>
-            <div class="header-actions">
-                <div class="api-status" id="apiStatus" title="Статус подключения к API">
+            <div class="header-right">
+                <div class="api-status" id="apiStatus" title="Статус API">
                     <span class="api-status-dot"></span>
                     <span id="apiStatusText">Демо</span>
                 </div>
-                <button class="icon-btn" id="settingsBtn" title="Настройки API">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
-                    </svg>
-                </button>
             </div>
         </div>
 
         <!-- Messages -->
         <div class="chat-messages" id="chatMessages">
-            <div class="welcome-message">
+            <div class="welcome-message" id="welcomeMessage">
                 <h2>Добро пожаловать 👋</h2>
                 <p>Я — IncludeAI, ваш интеллектуальный ассистент.<br>Задайте мне любой вопрос, и я постараюсь помочь.</p>
                 <div class="hint">
-                    💡 Нажмите на <strong>⚙️</strong> в правом верхнем углу, чтобы подключить ваш API-ключ Hugging Face и получить доступ к реальным ИИ-моделям.
+                    💡 Нажмите на <strong>☰</strong> слева, чтобы открыть меню чатов и настроить API-ключ Hugging Face.
                 </div>
             </div>
         </div>
@@ -967,9 +1207,7 @@
                     autocomplete="off"
                 ></textarea>
                 <button class="send-btn" id="sendBtn" title="Отправить">
-                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
-                    </svg>
+                    <svg viewBox="0 0 24 24"><path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/></svg>
                 </button>
             </div>
         </div>
@@ -998,7 +1236,7 @@
                     >
                     <p class="form-hint">
                         Получите ключ на <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">huggingface.co/settings/tokens</a>. 
-                        Создайте токен с ролью <strong>Read</strong>. Ключ хранится только в вашем браузере (localStorage).
+                        Создайте токен с ролью <strong>Read</strong>. Ключ хранится только в вашем браузере.
                     </p>
                 </div>
                 <div class="form-group">
@@ -1013,7 +1251,7 @@
                         <option value="google/gemma-2-2b-it">Google: Gemma 2 2B</option>
                         <option value="HuggingFaceH4/zephyr-7b-beta">Zephyr 7B Beta</option>
                     </select>
-                    <p class="form-hint">Выберите модель, которую будет использовать IncludeAI. Некоторые модели могут требовать Pro-аккаунт HF.</p>
+                    <p class="form-hint">Некоторые модели могут требовать Pro-аккаунт HF.</p>
                 </div>
             </div>
             <div class="modal-footer">
@@ -1026,239 +1264,258 @@
 
     <script>
         /* =================================================================
-           🔑 🔑 🔑  КУДА ВСТАВЛЯТЬ API-КЛЮЧ HUGGING FACE  🔑 🔑 🔑
+           🔑 КУДА ВСТАВЛЯТЬ API-КЛЮЧ HUGGING FACE
            =================================================================
+           СПОСОБ 1 (рекомендуется): через меню ☰ → Настройки
            
-           У ВАС ЕСТЬ ДВА СПОСОБА ПОДКЛЮЧИТЬ КЛЮЧ:
+           СПОСОБ 2: прописать прямо здесь:
+             const DEFAULT_API_KEY = 'hf_ВАШ_КЛЮЧ';
            
-           ┌─────────────────────────────────────────────────────────────┐
-           │ СПОСОБ 1 (рекомендуется): через интерфейс                  │
-           │                                                             │
-           │   1. Откройте этот файл в браузере                          │
-           │   2. Нажмите на шестерёнку ⚙️ в правом верхнем углу         │
-           │   3. Вставьте ваш ключ в поле "API-ключ Hugging Face"       │
-           │   4. Выберите модель и нажмите "Сохранить"                  │
-           │   5. Ключ сохранится в localStorage и будет подхватываться  │
-           └─────────────────────────────────────────────────────────────┘
-           
-           ┌─────────────────────────────────────────────────────────────┐
-           │ СПОСОБ 2: прописать ключ прямо в коде ниже                 │
-           │                                                             │
-           │   Найдите строку:                                           │
-           │     const DEFAULT_API_KEY = '';                             │
-           │                                                             │
-           │   И замените её на:                                         │
-           │     const DEFAULT_API_KEY = 'hf_ВАШ_КЛЮЧ_СЮДА';             │
-           │                                                             │
-           │   Например:                                                 │
-           │     const DEFAULT_API_KEY = 'hf_abc123xyz456...';           │
-           └─────────────────────────────────────────────────────────────┘
-           
-           📍 ГДЕ ПОЛУЧИТЬ КЛЮЧ:
-              https://huggingface.co/settings/tokens
-              1. Залогиньтесь на huggingface.co
-              2. Перейдите в Settings → Access Tokens
-              3. Нажмите "Create new token"
-              4. Выберите тип "Read" (достаточно для инференса)
-              5. Скопируйте токен (начинается с "hf_...")
-           
+           📍 Получить ключ: https://huggingface.co/settings/tokens
            ================================================================= */
 
-        // 👇👇👇 ВСТАВЬТЕ СЮДА СВОЙ КЛЮЧ HUGGING FACE (или оставьте пустым) 👇👇👇
-        const DEFAULT_API_KEY = '';
-        // 👆👆👆 ВСТАВЬТЕ СЮДА СВОЙ КЛЮЧ HUGGING FACE (или оставьте пустым) 👆👆👆
-
-        // Модель по умолчанию (можно переопределить в настройках)
+        const DEFAULT_API_KEY = ''; // 👈 ВСТАВЬТЕ КЛЮЧ СЮДА (или оставьте пустым)
         const DEFAULT_MODEL = 'meta-llama/Llama-3.3-70B-Instruct';
-
-        // Hugging Face Inference Router (OpenAI-совместимый endpoint)
         const HF_API_URL = 'https://router.huggingface.co/v1/chat/completions';
-
-        // Системный промпт для IncludeAI
         const SYSTEM_PROMPT = 'Ты — IncludeAI, элегантный и умный ИИ-ассистент. Отвечай дружелюбно, по делу и структурированно. При необходимости используй markdown-форматирование и блоки кода.';
 
         /* =================================================================
-           ЛОГИКА ПРИЛОЖЕНИЯ (ниже трогать не нужно)
+           СОСТОЯНИЕ ПРИЛОЖЕНИЯ
            ================================================================= */
+        const STORAGE_KEYS = {
+            apiKey: 'includeai_hf_key',
+            model: 'includeai_hf_model',
+            chats: 'includeai_chats',
+            currentChatId: 'includeai_current_chat'
+        };
 
-        const chatMessages = document.getElementById('chatMessages');
-        const chatInput = document.getElementById('chatInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const settingsBtn = document.getElementById('settingsBtn');
-        const settingsModal = document.getElementById('settingsModal');
-        const modalClose = document.getElementById('modalClose');
-        const apiKeyInput = document.getElementById('apiKeyInput');
-        const modelSelect = document.getElementById('modelSelect');
-        const saveBtn = document.getElementById('saveBtn');
-        const cancelBtn = document.getElementById('cancelBtn');
-        const clearKeyBtn = document.getElementById('clearKeyBtn');
-        const apiStatus = document.getElementById('apiStatus');
-        const apiStatusText = document.getElementById('apiStatusText');
+        let state = {
+            chats: [],           // [{id, title, messages[], createdAt}]
+            currentChatId: null, // id текущего чата
+            messageHistory: [],  // сообщения текущего чата (для API)
+            isWaitingResponse: false
+        };
 
-        let messageHistory = [];
+        /* =================================================================
+           DOM-ЭЛЕМЕНТЫ
+           ================================================================= */
+        const $ = (id) => document.getElementById(id);
+        const chatMessages = $('chatMessages');
+        const chatInput = $('chatInput');
+        const sendBtn = $('sendBtn');
+        const menuBtn = $('menuBtn');
+        const sidebar = $('sidebar');
+        const sidebarOverlay = $('sidebarOverlay');
+        const sidebarClose = $('sidebarClose');
+        const newChatBtn = $('newChatBtn');
+        const chatsList = $('chatsList');
+        const chatsEmpty = $('chatsEmpty');
+        const settingsBtn = $('settingsBtn');
+        const settingsStatus = $('settingsStatus');
+        const settingsModal = $('settingsModal');
+        const modalClose = $('modalClose');
+        const apiKeyInput = $('apiKeyInput');
+        const modelSelect = $('modelSelect');
+        const saveBtn = $('saveBtn');
+        const cancelBtn = $('cancelBtn');
+        const clearKeyBtn = $('clearKeyBtn');
+        const apiStatus = $('apiStatus');
+        const apiStatusText = $('apiStatusText');
+        const welcomeMessage = $('welcomeMessage');
 
-        function loadSettings() {
-            const savedKey = localStorage.getItem('includeai_hf_key') || DEFAULT_API_KEY;
-            const savedModel = localStorage.getItem('includeai_hf_model') || DEFAULT_MODEL;
-            return { apiKey: savedKey, model: savedModel };
+        /* =================================================================
+           ХРАНИЛИЩЕ (localStorage)
+           ================================================================= */
+        function loadAllData() {
+            // API настройки
+            const apiKey = localStorage.getItem(STORAGE_KEYS.apiKey) || DEFAULT_API_KEY;
+            const model = localStorage.getItem(STORAGE_KEYS.model) || DEFAULT_MODEL;
+
+            // Чаты
+            let chats = [];
+            try {
+                chats = JSON.parse(localStorage.getItem(STORAGE_KEYS.chats) || '[]');
+            } catch (e) { chats = []; }
+
+            const currentChatId = localStorage.getItem(STORAGE_KEYS.currentChatId);
+
+            return { apiKey, model, chats, currentChatId };
         }
 
-        function saveSettings(apiKey, model) {
+        function saveChats() {
+            localStorage.setItem(STORAGE_KEYS.chats, JSON.stringify(state.chats));
+        }
+
+        function saveCurrentChatId() {
+            if (state.currentChatId) {
+                localStorage.setItem(STORAGE_KEYS.currentChatId, state.currentChatId);
+            }
+        }
+
+        function saveApiSettings(apiKey, model) {
             if (apiKey) {
-                localStorage.setItem('includeai_hf_key', apiKey);
+                localStorage.setItem(STORAGE_KEYS.apiKey, apiKey);
             } else {
-                localStorage.removeItem('includeai_hf_key');
+                localStorage.removeItem(STORAGE_KEYS.apiKey);
             }
-            localStorage.setItem('includeai_hf_model', model);
-            updateApiStatus();
+            localStorage.setItem(STORAGE_KEYS.model, model);
         }
 
-        function updateApiStatus() {
-            const { apiKey } = loadSettings();
-            if (apiKey) {
-                apiStatus.classList.add('connected');
-                apiStatusText.textContent = 'HF';
-                apiStatus.title = 'Hugging Face API подключён';
+        function getApiSettings() {
+            const apiKey = localStorage.getItem(STORAGE_KEYS.apiKey) || DEFAULT_API_KEY;
+            const model = localStorage.getItem(STORAGE_KEYS.model) || DEFAULT_MODEL;
+            return { apiKey, model };
+        }
+
+        /* =================================================================
+           УПРАВЛЕНИЕ ЧАТАМИ
+           ================================================================= */
+        function generateId() {
+            return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6);
+        }
+
+        function createNewChat(switchTo = true) {
+            const chat = {
+                id: generateId(),
+                title: 'Новый чат',
+                messages: [],
+                createdAt: Date.now()
+            };
+            state.chats.unshift(chat);
+            saveChats();
+
+            if (switchTo) {
+                switchToChat(chat.id);
+            }
+            renderChatsList();
+            return chat;
+        }
+
+        function switchToChat(chatId) {
+            const chat = state.chats.find(c => c.id === chatId);
+            if (!chat) return;
+
+            state.currentChatId = chatId;
+            state.messageHistory = [...chat.messages];
+            saveCurrentChatId();
+
+            // Рендер сообщений
+            renderMessages(chat);
+            renderChatsList();
+        }
+
+        function deleteChat(chatId) {
+            state.chats = state.chats.filter(c => c.id !== chatId);
+            saveChats();
+
+            // Если удалили текущий — переключаемся
+            if (state.currentChatId === chatId) {
+                if (state.chats.length > 0) {
+                    switchToChat(state.chats[0].id);
+                } else {
+                    createNewChat(true);
+                }
+            }
+            renderChatsList();
+        }
+
+        function updateChatTitle(chatId, firstUserMessage) {
+            const chat = state.chats.find(c => c.id === chatId);
+            if (!chat || chat.title !== 'Новый чат') return;
+
+            let title = firstUserMessage.trim();
+            if (title.length > 40) title = title.substring(0, 40) + '…';
+            chat.title = title;
+            saveChats();
+            renderChatsList();
+        }
+
+        function addMessageToCurrentChat(role, content) {
+            const chat = state.chats.find(c => c.id === state.currentChatId);
+            if (!chat) return;
+
+            chat.messages.push({ role, content });
+            saveChats();
+        }
+
+        /* =================================================================
+           РЕНДЕР
+           ================================================================= */
+        function renderChatsList() {
+            // Удаляем старые элементы (кроме label и empty)
+            const items = chatsList.querySelectorAll('.chat-item');
+            items.forEach(el => el.remove());
+
+            if (state.chats.length === 0) {
+                chatsEmpty.style.display = 'block';
+                return;
+            }
+
+            chatsEmpty.style.display = 'none';
+
+            state.chats.forEach(chat => {
+                const item = document.createElement('div');
+                item.className = 'chat-item' + (chat.id === state.currentChatId ? ' active' : '');
+                item.dataset.id = chat.id;
+
+                item.innerHTML = `
+                    <div class="chat-item-icon">
+                        <svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+                    </div>
+                    <div class="chat-item-title">${escapeHtml(chat.title)}</div>
+                    <button class="chat-item-delete" title="Удалить чат">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z"/>
+                        </svg>
+                    </button>
+                `;
+
+                // Клик по чату — переключение
+                item.addEventListener('click', (e) => {
+                    if (e.target.closest('.chat-item-delete')) return;
+                    switchToChat(chat.id);
+                    closeSidebar();
+                });
+
+                // Клик по удалению
+                const deleteBtn = item.querySelector('.chat-item-delete');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if (confirm('Удалить этот чат?')) {
+                        deleteChat(chat.id);
+                    }
+                });
+
+                chatsList.appendChild(item);
+            });
+        }
+
+        function renderMessages(chat) {
+            chatMessages.innerHTML = '';
+
+            if (chat.messages.length === 0) {
+                // Показываем welcome
+                const welcome = document.createElement('div');
+                welcome.className = 'welcome-message';
+                welcome.innerHTML = `
+                    <h2>Добро пожаловать 👋</h2>
+                    <p>Я — IncludeAI, ваш интеллектуальный ассистент.<br>Задайте мне любой вопрос, и я постараюсь помочь.</p>
+                    <div class="hint">💡 Нажмите на <strong>☰</strong> слева, чтобы открыть меню чатов и настроить API-ключ.</div>
+                `;
+                chatMessages.appendChild(welcome);
             } else {
-                apiStatus.classList.remove('connected');
-                apiStatusText.textContent = 'Демо';
-                apiStatus.title = 'Демо-режим (API-ключ не задан)';
+                chat.messages.forEach(msg => {
+                    appendMessageToDOM(msg.content, msg.role === 'user' ? 'user' : 'ai');
+                });
             }
+            scrollToBottom();
         }
 
-        function openSettings() {
-            const { apiKey, model } = loadSettings();
-            apiKeyInput.value = apiKey || '';
-            const optionExists = Array.from(modelSelect.options).some(o => o.value === model);
-            modelSelect.value = optionExists ? model : DEFAULT_MODEL;
-            settingsModal.classList.add('active');
-        }
-
-        function closeSettings() {
-            settingsModal.classList.remove('active');
-        }
-
-        settingsBtn.addEventListener('click', openSettings);
-        modalClose.addEventListener('click', closeSettings);
-        cancelBtn.addEventListener('click', closeSettings);
-
-        settingsModal.addEventListener('click', (e) => {
-            if (e.target === settingsModal) closeSettings();
-        });
-
-        saveBtn.addEventListener('click', () => {
-            const key = apiKeyInput.value.trim();
-            const model = modelSelect.value;
-            saveSettings(key, model);
-            closeSettings();
-        });
-
-        clearKeyBtn.addEventListener('click', () => {
-            apiKeyInput.value = '';
-            saveSettings('', modelSelect.value);
-        });
-
-        // Auto-resize textarea
-        chatInput.addEventListener('input', () => {
-            chatInput.style.height = 'auto';
-            chatInput.style.height = Math.min(chatInput.scrollHeight, 100) + 'px';
-        });
-
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendMessage();
-            }
-        });
-
-        sendBtn.addEventListener('click', sendMessage);
-
-        async function sendMessage() {
-            const text = chatInput.value.trim();
-            if (!text) return;
-
+        function appendMessageToDOM(text, sender, isError = false) {
+            // Удаляем welcome если есть
             const welcome = chatMessages.querySelector('.welcome-message');
             if (welcome) welcome.remove();
 
-            appendMessage(text, 'user');
-            messageHistory.push({ role: 'user', content: text });
-
-            chatInput.value = '';
-            chatInput.style.height = 'auto';
-            setInputEnabled(false);
-
-            const typingEl = showTypingIndicator();
-
-            const { apiKey, model } = loadSettings();
-
-            try {
-                let responseText;
-                if (apiKey) {
-                    responseText = await callHuggingFace(apiKey, model);
-                } else {
-                    await new Promise(r => setTimeout(r, 1500));
-                    responseText = generateDemoResponse(text);
-                }
-
-                typingEl.remove();
-                appendMessage(responseText, 'ai');
-                messageHistory.push({ role: 'assistant', content: responseText });
-            } catch (err) {
-                typingEl.remove();
-                console.error('API Error:', err);
-                appendMessage(`⚠️ Ошибка при обращении к Hugging Face API: ${err.message}`, 'ai', true);
-            } finally {
-                setInputEnabled(true);
-                chatInput.focus();
-            }
-        }
-
-        async function callHuggingFace(apiKey, model) {
-            const messages = [
-                { role: 'system', content: SYSTEM_PROMPT },
-                ...messageHistory
-            ];
-
-            const response = await fetch(HF_API_URL, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    model: model,
-                    messages: messages,
-                    temperature: 0.7,
-                    max_tokens: 2048
-                })
-            });
-
-            if (!response.ok) {
-                let errorText = `HTTP ${response.status}`;
-                try {
-                    const errData = await response.json();
-                    if (errData.error) {
-                        errorText = typeof errData.error === 'string' 
-                            ? errData.error 
-                            : (errData.error.message || JSON.stringify(errData.error));
-                    }
-                } catch (e) {}
-                
-                if (response.status === 401) {
-                    errorText = 'Неверный API-ключ. Проверьте токен в настройках.';
-                } else if (response.status === 503) {
-                    errorText = 'Модель загружается. Попробуйте через 20-30 секунд.';
-                } else if (response.status === 429) {
-                    errorText = 'Превышен лимит запросов. Подождите немного.';
-                }
-                throw new Error(errorText);
-            }
-
-            const data = await response.json();
-            return data.choices?.[0]?.message?.content || '(Пустой ответ от модели)';
-        }
-
-        function appendMessage(text, sender, isError = false) {
             const messageDiv = document.createElement('div');
             messageDiv.classList.add('message');
             messageDiv.classList.add(sender === 'user' ? 'message-user' : 'message-ai');
@@ -1323,31 +1580,246 @@
             return typingDiv;
         }
 
+        function scrollToBottom() {
+            chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+        }
+
+        /* =================================================================
+           SIDEBAR
+           ================================================================= */
+        function openSidebar() {
+            sidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        }
+
+        menuBtn.addEventListener('click', openSidebar);
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        newChatBtn.addEventListener('click', () => {
+            // Сохраняем текущий чат (он уже сохраняется автоматически)
+            // Создаём новый
+            createNewChat(true);
+            closeSidebar();
+            chatInput.focus();
+        });
+
+        /* =================================================================
+           SETTINGS MODAL
+           ================================================================= */
+        function openSettings() {
+            const { apiKey, model } = getApiSettings();
+            apiKeyInput.value = apiKey || '';
+            const optionExists = Array.from(modelSelect.options).some(o => o.value === model);
+            modelSelect.value = optionExists ? model : DEFAULT_MODEL;
+            settingsModal.classList.add('active');
+            closeSidebar();
+        }
+
+        function closeSettings() {
+            settingsModal.classList.remove('active');
+        }
+
+        settingsBtn.addEventListener('click', openSettings);
+        modalClose.addEventListener('click', closeSettings);
+        cancelBtn.addEventListener('click', closeSettings);
+
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) closeSettings();
+        });
+
+        saveBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            const model = modelSelect.value;
+            saveApiSettings(key, model);
+            updateApiStatus();
+            closeSettings();
+        });
+
+        clearKeyBtn.addEventListener('click', () => {
+            apiKeyInput.value = '';
+            saveApiSettings('', modelSelect.value);
+            updateApiStatus();
+        });
+
+        function updateApiStatus() {
+            const { apiKey } = getApiSettings();
+            if (apiKey) {
+                apiStatus.classList.add('connected');
+                apiStatusText.textContent = 'HF';
+                apiStatus.title = 'Hugging Face API подключён';
+                settingsStatus.textContent = 'API подключён ✓';
+                settingsStatus.style.color = '#7FB069';
+            } else {
+                apiStatus.classList.remove('connected');
+                apiStatusText.textContent = 'Демо';
+                apiStatus.title = 'Демо-режим';
+                settingsStatus.textContent = 'API не подключён';
+                settingsStatus.style.color = '';
+            }
+        }
+
+        /* =================================================================
+           ОТПРАВКА СООБЩЕНИЙ
+           ================================================================= */
+        chatInput.addEventListener('input', () => {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 100) + 'px';
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text || state.isWaitingResponse) return;
+
+            // Если нет текущего чата — создаём
+            if (!state.currentChatId || !state.chats.find(c => c.id === state.currentChatId)) {
+                createNewChat(true);
+            }
+
+            // Обновляем заголовок чата по первому сообщению
+            if (state.messageHistory.length === 0) {
+                updateChatTitle(state.currentChatId, text);
+            }
+
+            // Добавляем сообщение пользователя
+            state.messageHistory.push({ role: 'user', content: text });
+            addMessageToCurrentChat('user', text);
+            appendMessageToDOM(text, 'user');
+
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            state.isWaitingResponse = true;
+            setInputEnabled(false);
+
+            const typingEl = showTypingIndicator();
+            const { apiKey, model } = getApiSettings();
+
+            try {
+                let responseText;
+                if (apiKey) {
+                    responseText = await callHuggingFace(apiKey, model);
+                } else {
+                    await new Promise(r => setTimeout(r, 1500));
+                    responseText = generateDemoResponse(text);
+                }
+
+                typingEl.remove();
+                state.messageHistory.push({ role: 'assistant', content: responseText });
+                addMessageToCurrentChat('assistant', responseText);
+                appendMessageToDOM(responseText, 'ai');
+            } catch (err) {
+                typingEl.remove();
+                console.error('API Error:', err);
+                appendMessageToDOM(`⚠️ Ошибка: ${err.message}`, 'ai', true);
+            } finally {
+                state.isWaitingResponse = false;
+                setInputEnabled(true);
+                chatInput.focus();
+            }
+        }
+
+        async function callHuggingFace(apiKey, model) {
+            const messages = [
+                { role: 'system', content: SYSTEM_PROMPT },
+                ...state.messageHistory
+            ];
+
+            const response = await fetch(HF_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: 2048
+                })
+            });
+
+            if (!response.ok) {
+                let errorText = `HTTP ${response.status}`;
+                try {
+                    const errData = await response.json();
+                    if (errData.error) {
+                        errorText = typeof errData.error === 'string' 
+                            ? errData.error 
+                            : (errData.error.message || JSON.stringify(errData.error));
+                    }
+                } catch (e) {}
+                
+                if (response.status === 401) errorText = 'Неверный API-ключ.';
+                else if (response.status === 503) errorText = 'Модель загружается. Попробуйте через 20-30 сек.';
+                else if (response.status === 429) errorText = 'Превышен лимит запросов.';
+                throw new Error(errorText);
+            }
+
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content || '(Пустой ответ)';
+        }
+
         function setInputEnabled(enabled) {
             chatInput.disabled = !enabled;
             sendBtn.disabled = !enabled;
         }
 
-        function scrollToBottom() {
-            chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
-        }
-
         function generateDemoResponse(userText) {
             const lower = userText.toLowerCase();
-            if (lower.includes('привет') || lower.includes('здравствуй') || lower.includes('hello')) {
-                return 'Здравствуйте! Рад вас видеть. Я — **IncludeAI**, ваш интеллектуальный ассистент. Чем могу помочь сегодня?';
+            if (lower.includes('привет') || lower.includes('здравствуй')) {
+                return 'Здравствуйте! Рад вас видеть. Я — **IncludeAI**. Чем могу помочь?';
             }
             if (lower.includes('код') || lower.includes('code')) {
-                return 'Вот пример функции на JavaScript:\n\n```javascript\nfunction greet(name) {\n  return `Привет, ${name}! 👋`;\n}\n\nconsole.log(greet("Мир"));\n```\n\n💡 *Это демо-режим. Подключите API-ключ Hugging Face в настройках (⚙️), чтобы получить настоящие ответы от ИИ.*';
+                return 'Вот пример:\n\n```javascript\nfunction greet(name) {\n  return `Привет, ${name}!`;\n}\n```\n\n💡 *Демо-режим. Подключите API в ☰ → Настройки.*';
             }
-            if (lower.includes('кто ты') || lower.includes('что ты')) {
-                return 'Я — **IncludeAI**, современный ИИ-ассистент. Сейчас я работаю в демо-режиме.\n\nЧтобы подключить реальные модели (Llama 3.3, Mistral, Qwen и др.), нажмите ⚙️ в правом верхнем углу и введите ваш API-ключ **Hugging Face**.';
-            }
-            return 'Это демо-режим работы IncludeAI. 🔑\n\nЧтобы получать настоящие ответы от ИИ, откройте настройки (⚙️) и укажите ваш API-ключ **Hugging Face**.\n\n📍 Получить ключ: https://huggingface.co/settings/tokens\n\nПосле подключения вы сможете использовать модели от Meta, Mistral, Qwen, Microsoft и других.';
+            return 'Это демо-режим. 🔑\n\nОткройте меню **☰** → **Настройки** и укажите API-ключ **Hugging Face**.\n\n📍 https://huggingface.co/settings/tokens';
         }
 
-        updateApiStatus();
-        chatInput.focus();
+        /* =================================================================
+           ИНИЦИАЛИЗАЦИЯ
+           ================================================================= */
+        function init() {
+            const data = loadAllData();
+
+            state.chats = data.chats;
+            state.currentChatId = data.currentChatId;
+
+            // Если чатов нет — создаём первый
+            if (state.chats.length === 0) {
+                createNewChat(true);
+            } else {
+                // Проверяем, существует ли текущий чат
+                const currentExists = state.chats.find(c => c.id === state.currentChatId);
+                if (!currentExists) {
+                    state.currentChatId = state.chats[0].id;
+                }
+                // Восстанавливаем историю
+                const currentChat = state.chats.find(c => c.id === state.currentChatId);
+                state.messageHistory = [...currentChat.messages];
+                renderMessages(currentChat);
+            }
+
+            renderChatsList();
+            updateApiStatus();
+            saveCurrentChatId();
+            chatInput.focus();
+        }
+
+        init();
     </script>
 </body>
 </html>
