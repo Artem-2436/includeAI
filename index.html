@@ -1,0 +1,1167 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IncludeAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-main: #FDFBF7;
+            --bg-card: #FFFFFF;
+            --gold-primary: #D4AF37;
+            --gold-secondary: #C5A059;
+            --gold-light: #F5E6B8;
+            --gold-cream: #FDF8EC;
+            --gold-glow: rgba(212, 175, 55, 0.15);
+            --gold-glow-strong: rgba(212, 175, 55, 0.3);
+            --text-primary: #2C2C2C;
+            --text-secondary: #6B6B6B;
+            --text-muted: #9A9A9A;
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --radius-sm: 12px;
+            --shadow-gold: 0 8px 32px rgba(212, 175, 55, 0.08), 0 2px 8px rgba(212, 175, 55, 0.04);
+            --shadow-gold-hover: 0 12px 48px rgba(212, 175, 55, 0.15), 0 4px 12px rgba(212, 175, 55, 0.08);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(197, 160, 89, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .chat-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 780px;
+            height: 90vh;
+            max-height: 900px;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: var(--shadow-gold);
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .chat-container:hover {
+            box-shadow: var(--shadow-gold-hover);
+        }
+
+        /* Header */
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 28px;
+            background: var(--bg-card);
+            border-bottom: 1px solid rgba(212, 175, 55, 0.12);
+            flex-shrink: 0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .logo-icon svg {
+            width: 22px;
+            height: 22px;
+            fill: white;
+        }
+
+        .logo-text {
+            font-size: 1.4rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-badge {
+            font-size: 0.65rem;
+            font-weight: 500;
+            color: var(--gold-secondary);
+            background: var(--gold-cream);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .icon-btn {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: var(--gold-secondary);
+        }
+
+        .icon-btn:hover {
+            background: var(--gold-cream);
+            border-color: var(--gold-primary);
+            transform: translateY(-1px);
+        }
+
+        .icon-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: currentColor;
+        }
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            background: var(--gold-cream);
+            color: var(--gold-secondary);
+        }
+
+        .api-status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #C0A0A0;
+        }
+
+        .api-status.connected .api-status-dot {
+            background: #7FB069;
+            box-shadow: 0 0 6px rgba(127, 176, 105, 0.5);
+        }
+
+        /* Messages Area */
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 28px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            scroll-behavior: smooth;
+        }
+
+        .chat-messages::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(212, 175, 55, 0.4);
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .welcome-message h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .welcome-message p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .welcome-message .hint {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: var(--gold-cream);
+            border: 1px dashed rgba(212, 175, 55, 0.3);
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            animation: fadeInUp 0.4s ease;
+            max-width: 85%;
+        }
+
+        .message-user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-ai {
+            align-self: flex-start;
+        }
+
+        .message-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .message-user .message-avatar {
+            background: linear-gradient(135deg, #E8E8E8, #D0D0D0);
+            color: #555;
+        }
+
+        .message-ai .message-avatar {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            box-shadow: 0 3px 10px rgba(212, 175, 55, 0.25);
+        }
+
+        .message-content {
+            padding: 14px 18px;
+            border-radius: var(--radius-md);
+            line-height: 1.65;
+            font-size: 0.92rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .message-user .message-content {
+            background: var(--bg-card);
+            border: 1px solid rgba(212, 175, 55, 0.25);
+            color: var(--text-primary);
+            border-bottom-right-radius: 6px;
+            box-shadow: 0 2px 8px rgba(212, 175, 55, 0.05);
+        }
+
+        .message-ai .message-content {
+            background: var(--gold-cream);
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            color: var(--text-primary);
+            border-bottom-left-radius: 6px;
+        }
+
+        .message-content pre {
+            background: #1E1E2E;
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin: 12px 0;
+            overflow-x: auto;
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .message-content code {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.82rem;
+            line-height: 1.7;
+            color: #E0D8C8;
+        }
+
+        .message-content p code {
+            background: rgba(212, 175, 55, 0.1);
+            padding: 2px 7px;
+            border-radius: 6px;
+            font-size: 0.84rem;
+            color: var(--gold-secondary);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+        }
+
+        .message-content p {
+            margin-bottom: 8px;
+        }
+
+        .message-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .message-error {
+            background: #FFF5F5 !important;
+            border-color: rgba(200, 80, 80, 0.3) !important;
+            color: #8B3A3A !important;
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: fadeInUp 0.3s ease;
+            align-self: flex-start;
+        }
+
+        .typing-dots {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 16px 20px;
+            background: var(--gold-cream);
+            border: 1px solid rgba(212, 175, 55, 0.12);
+            border-radius: var(--radius-md);
+            border-bottom-left-radius: 6px;
+        }
+
+        .typing-dots span {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            animation: bounce 1.4s ease-in-out infinite;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes bounce {
+            0%, 60%, 100% {
+                transform: translateY(0);
+                opacity: 0.4;
+            }
+            30% {
+                transform: translateY(-8px);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 20px 24px;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+            background: var(--bg-card);
+            flex-shrink: 0;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-main);
+            border: 1.5px solid rgba(212, 175, 55, 0.15);
+            border-radius: var(--radius-md);
+            padding: 6px 6px 6px 18px;
+            transition: var(--transition);
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--gold-primary);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+            background: var(--bg-card);
+        }
+
+        .chat-input {
+            flex: 1;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.93rem;
+            color: var(--text-primary);
+            padding: 10px 0;
+            resize: none;
+            max-height: 120px;
+            line-height: 1.5;
+        }
+
+        .chat-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .send-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .send-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: none;
+        }
+
+        .send-btn svg {
+            width: 18px;
+            height: 18px;
+            fill: white;
+            transition: var(--transition);
+        }
+
+        .send-btn:hover svg {
+            transform: translateX(1px);
+        }
+
+        /* Settings Modal */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(44, 44, 44, 0.4);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            box-shadow: var(--shadow-gold-hover);
+            width: 100%;
+            max-width: 520px;
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: scale(0.95) translateY(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-header {
+            padding: 24px 28px 16px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: var(--gold-cream);
+            color: var(--gold-secondary);
+        }
+
+        .modal-body {
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .form-hint a {
+            color: var(--gold-secondary);
+            text-decoration: none;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+        }
+
+        .form-hint a:hover {
+            border-bottom-color: var(--gold-primary);
+        }
+
+        .form-input, .form-select {
+            padding: 12px 14px;
+            border: 1.5px solid rgba(212, 175, 55, 0.15);
+            border-radius: var(--radius-sm);
+            background: var(--bg-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+            outline: none;
+            width: 100%;
+        }
+
+        .form-input:focus, .form-select:focus {
+            border-color: var(--gold-primary);
+            background: var(--bg-card);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.08);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .modal-footer {
+            padding: 16px 28px 24px;
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: var(--radius-sm);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--gold-primary), var(--gold-secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border-color: rgba(212, 175, 55, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gold-cream);
+            color: var(--gold-secondary);
+        }
+
+        .btn-danger {
+            background: transparent;
+            color: #B85454;
+            border-color: rgba(184, 84, 84, 0.2);
+        }
+
+        .btn-danger:hover {
+            background: #FFF5F5;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 0;
+                align-items: stretch;
+            }
+
+            .chat-container {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                border: none;
+            }
+
+            .chat-header {
+                padding: 16px 20px;
+            }
+
+            .chat-messages {
+                padding: 20px 16px;
+            }
+
+            .chat-input-area {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 92%;
+            }
+
+            .welcome-message {
+                padding: 30px 16px;
+            }
+
+            .welcome-message h2 {
+                font-size: 1.3rem;
+            }
+
+            .logo-text {
+                font-size: 1.2rem;
+            }
+
+            .logo-badge {
+                display: none;
+            }
+
+            .api-status span:last-child {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <!-- Header -->
+        <div class="chat-header">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+                    </svg>
+                </div>
+                <span class="logo-text">IncludeAI</span>
+                <span class="logo-badge">Beta</span>
+            </div>
+            <div class="header-actions">
+                <div class="api-status" id="apiStatus" title="Статус подключения к API">
+                    <span class="api-status-dot"></span>
+                    <span id="apiStatusText">Демо</span>
+                </div>
+                <button class="icon-btn" id="settingsBtn" title="Настройки API">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.488.488 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94 0 .31.02.64.07.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Messages -->
+        <div class="chat-messages" id="chatMessages">
+            <div class="welcome-message">
+                <h2>Добро пожаловать 👋</h2>
+                <p>Я — IncludeAI, ваш интеллектуальный ассистент.<br>Задайте мне любой вопрос, и я постараюсь помочь.</p>
+                <div class="hint">
+                    💡 Нажмите на <strong>⚙️</strong> в правом верхнем углу, чтобы подключить ваш API-ключ Hugging Face и получить доступ к реальным ИИ-моделям.
+                </div>
+            </div>
+        </div>
+
+        <!-- Input -->
+        <div class="chat-input-area">
+            <div class="input-wrapper">
+                <textarea 
+                    class="chat-input" 
+                    id="chatInput" 
+                    placeholder="Напишите сообщение..." 
+                    rows="1"
+                    autocomplete="off"
+                ></textarea>
+                <button class="send-btn" id="sendBtn" title="Отправить">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div class="modal-overlay" id="settingsModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Настройки API</h3>
+                <button class="modal-close" id="modalClose">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">🔑 API-ключ Hugging Face</label>
+                    <input 
+                        type="password" 
+                        class="form-input" 
+                        id="apiKeyInput" 
+                        placeholder="hf_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+                        autocomplete="off"
+                    >
+                    <p class="form-hint">
+                        Получите ключ на <a href="https://huggingface.co/settings/tokens" target="_blank" rel="noopener">huggingface.co/settings/tokens</a>. 
+                        Создайте токен с ролью <strong>Read</strong>. Ключ хранится только в вашем браузере (localStorage).
+                    </p>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">🤖 Модель</label>
+                    <select class="form-select" id="modelSelect">
+                        <option value="meta-llama/Llama-3.3-70B-Instruct">Meta: Llama 3.3 70B Instruct</option>
+                        <option value="meta-llama/Llama-3.1-8B-Instruct">Meta: Llama 3.1 8B Instruct</option>
+                        <option value="mistralai/Mistral-7B-Instruct-v0.3">Mistral: 7B Instruct v0.3</option>
+                        <option value="mistralai/Mixtral-8x7B-Instruct-v0.1">Mistral: Mixtral 8x7B</option>
+                        <option value="Qwen/Qwen2.5-72B-Instruct">Qwen: 2.5 72B Instruct</option>
+                        <option value="microsoft/Phi-3-mini-4k-instruct">Microsoft: Phi-3 Mini</option>
+                        <option value="google/gemma-2-2b-it">Google: Gemma 2 2B</option>
+                        <option value="HuggingFaceH4/zephyr-7b-beta">Zephyr 7B Beta</option>
+                    </select>
+                    <p class="form-hint">Выберите модель, которую будет использовать IncludeAI. Некоторые модели могут требовать Pro-аккаунт HF.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-danger" id="clearKeyBtn">Очистить ключ</button>
+                <button class="btn btn-secondary" id="cancelBtn">Отмена</button>
+                <button class="btn btn-primary" id="saveBtn">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* =================================================================
+           🔑 🔑 🔑  КУДА ВСТАВЛЯТЬ API-КЛЮЧ HUGGING FACE  🔑 🔑 🔑
+           =================================================================
+           
+           У ВАС ЕСТЬ ДВА СПОСОБА ПОДКЛЮЧИТЬ КЛЮЧ:
+           
+           ┌─────────────────────────────────────────────────────────────┐
+           │ СПОСОБ 1 (рекомендуется): через интерфейс                  │
+           │                                                             │
+           │   1. Откройте этот файл в браузере                          │
+           │   2. Нажмите на шестерёнку ⚙️ в правом верхнем углу         │
+           │   3. Вставьте ваш ключ в поле "API-ключ Hugging Face"       │
+           │   4. Выберите модель и нажмите "Сохранить"                  │
+           │   5. Ключ сохранится в localStorage и будет подхватываться  │
+           └─────────────────────────────────────────────────────────────┘
+           
+           ┌─────────────────────────────────────────────────────────────┐
+           │ СПОСОБ 2: прописать ключ прямо в коде ниже                 │
+           │                                                             │
+           │   Найдите строку:                                           │
+           │     const DEFAULT_API_KEY = '';                             │
+           │                                                             │
+           │   И замените её на:                                         │
+           │     const DEFAULT_API_KEY = 'hf_ВАШ_КЛЮЧ_СЮДА';             │
+           │                                                             │
+           │   Например:                                                 │
+           │     const DEFAULT_API_KEY = 'hf_abc123xyz456...';           │
+           └─────────────────────────────────────────────────────────────┘
+           
+           📍 ГДЕ ПОЛУЧИТЬ КЛЮЧ:
+              https://huggingface.co/settings/tokens
+              1. Залогиньтесь на huggingface.co
+              2. Перейдите в Settings → Access Tokens
+              3. Нажмите "Create new token"
+              4. Выберите тип "Read" (достаточно для инференса)
+              5. Скопируйте токен (начинается с "hf_...")
+           
+           ================================================================= */
+
+        // 👇👇👇 ВСТАВЬТЕ СЮДА СВОЙ КЛЮЧ HUGGING FACE (или оставьте пустым) 👇👇👇
+        const DEFAULT_API_KEY = '';
+        // 👆👆👆 ВСТАВЬТЕ СЮДА СВОЙ КЛЮЧ HUGGING FACE (или оставьте пустым) 👆👆👆
+
+        // Модель по умолчанию (можно переопределить в настройках)
+        const DEFAULT_MODEL = 'meta-llama/Llama-3.3-70B-Instruct';
+
+        // Hugging Face Inference Router (OpenAI-совместимый endpoint)
+        const HF_API_URL = 'https://router.huggingface.co/v1/chat/completions';
+
+        // Системный промпт для IncludeAI
+        const SYSTEM_PROMPT = 'Ты — IncludeAI, элегантный и умный ИИ-ассистент. Отвечай дружелюбно, по делу и структурированно. При необходимости используй markdown-форматирование и блоки кода.';
+
+        /* =================================================================
+           ЛОГИКА ПРИЛОЖЕНИЯ (ниже трогать не нужно)
+           ================================================================= */
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const sendBtn = document.getElementById('sendBtn');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsModal = document.getElementById('settingsModal');
+        const modalClose = document.getElementById('modalClose');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const modelSelect = document.getElementById('modelSelect');
+        const saveBtn = document.getElementById('saveBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const clearKeyBtn = document.getElementById('clearKeyBtn');
+        const apiStatus = document.getElementById('apiStatus');
+        const apiStatusText = document.getElementById('apiStatusText');
+
+        let messageHistory = [];
+
+        function loadSettings() {
+            const savedKey = localStorage.getItem('includeai_hf_key') || DEFAULT_API_KEY;
+            const savedModel = localStorage.getItem('includeai_hf_model') || DEFAULT_MODEL;
+            return { apiKey: savedKey, model: savedModel };
+        }
+
+        function saveSettings(apiKey, model) {
+            if (apiKey) {
+                localStorage.setItem('includeai_hf_key', apiKey);
+            } else {
+                localStorage.removeItem('includeai_hf_key');
+            }
+            localStorage.setItem('includeai_hf_model', model);
+            updateApiStatus();
+        }
+
+        function updateApiStatus() {
+            const { apiKey } = loadSettings();
+            if (apiKey) {
+                apiStatus.classList.add('connected');
+                apiStatusText.textContent = 'HF';
+                apiStatus.title = 'Hugging Face API подключён';
+            } else {
+                apiStatus.classList.remove('connected');
+                apiStatusText.textContent = 'Демо';
+                apiStatus.title = 'Демо-режим (API-ключ не задан)';
+            }
+        }
+
+        function openSettings() {
+            const { apiKey, model } = loadSettings();
+            apiKeyInput.value = apiKey || '';
+            // Устанавливаем модель, если она есть в списке
+            const optionExists = Array.from(modelSelect.options).some(o => o.value === model);
+            modelSelect.value = optionExists ? model : DEFAULT_MODEL;
+            settingsModal.classList.add('active');
+        }
+
+        function closeSettings() {
+            settingsModal.classList.remove('active');
+        }
+
+        settingsBtn.addEventListener('click', openSettings);
+        modalClose.addEventListener('click', closeSettings);
+        cancelBtn.addEventListener('click', closeSettings);
+
+        settingsModal.addEventListener('click', (e) => {
+            if (e.target === settingsModal) closeSettings();
+        });
+
+        saveBtn.addEventListener('click', () => {
+            const key = apiKeyInput.value.trim();
+            const model = modelSelect.value;
+            saveSettings(key, model);
+            closeSettings();
+        });
+
+        clearKeyBtn.addEventListener('click', () => {
+            apiKeyInput.value = '';
+            saveSettings('', modelSelect.value);
+        });
+
+        // Auto-resize textarea
+        chatInput.addEventListener('input', () => {
+            chatInput.style.height = 'auto';
+            chatInput.style.height = Math.min(chatInput.scrollHeight, 120) + 'px';
+        });
+
+        chatInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        sendBtn.addEventListener('click', sendMessage);
+
+        async function sendMessage() {
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            const welcome = chatMessages.querySelector('.welcome-message');
+            if (welcome) welcome.remove();
+
+            appendMessage(text, 'user');
+            messageHistory.push({ role: 'user', content: text });
+
+            chatInput.value = '';
+            chatInput.style.height = 'auto';
+            setInputEnabled(false);
+
+            const typingEl = showTypingIndicator();
+
+            const { apiKey, model } = loadSettings();
+
+            try {
+                let responseText;
+                if (apiKey) {
+                    responseText = await callHuggingFace(apiKey, model);
+                } else {
+                    // Демо-режим: имитация ответа
+                    await new Promise(r => setTimeout(r, 1500));
+                    responseText = generateDemoResponse(text);
+                }
+
+                typingEl.remove();
+                appendMessage(responseText, 'ai');
+                messageHistory.push({ role: 'assistant', content: responseText });
+            } catch (err) {
+                typingEl.remove();
+                console.error('API Error:', err);
+                appendMessage(`⚠️ Ошибка при обращении к Hugging Face API: ${err.message}`, 'ai', true);
+            } finally {
+                setInputEnabled(true);
+                chatInput.focus();
+            }
+        }
+
+        // Запрос к Hugging Face Inference Router
+        async function callHuggingFace(apiKey, model) {
+            const messages = [
+                { role: 'system', content: SYSTEM_PROMPT },
+                ...messageHistory
+            ];
+
+            const response = await fetch(HF_API_URL, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: messages,
+                    temperature: 0.7,
+                    max_tokens: 2048
+                })
+            });
+
+            if (!response.ok) {
+                let errorText = `HTTP ${response.status}`;
+                try {
+                    const errData = await response.json();
+                    if (errData.error) {
+                        errorText = typeof errData.error === 'string' 
+                            ? errData.error 
+                            : (errData.error.message || JSON.stringify(errData.error));
+                    }
+                } catch (e) {}
+                
+                if (response.status === 401) {
+                    errorText = 'Неверный API-ключ. Проверьте токен в настройках.';
+                } else if (response.status === 503) {
+                    errorText = 'Модель загружается. Попробуйте через 20-30 секунд.';
+                } else if (response.status === 429) {
+                    errorText = 'Превышен лимит запросов. Подождите немного.';
+                }
+                throw new Error(errorText);
+            }
+
+            const data = await response.json();
+            return data.choices?.[0]?.message?.content || '(Пустой ответ от модели)';
+        }
+
+        function appendMessage(text, sender, isError = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message');
+            messageDiv.classList.add(sender === 'user' ? 'message-user' : 'message-ai');
+
+            const avatar = document.createElement('div');
+            avatar.classList.add('message-avatar');
+            avatar.textContent = sender === 'user' ? 'Вы' : 'AI';
+
+            const content = document.createElement('div');
+            content.classList.add('message-content');
+            if (isError) content.classList.add('message-error');
+
+            if (sender === 'ai') {
+                content.innerHTML = formatAIResponse(text);
+            } else {
+                content.textContent = text;
+            }
+
+            messageDiv.appendChild(avatar);
+            messageDiv.appendChild(content);
+            chatMessages.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function formatAIResponse(text) {
+            let formatted = text;
+            formatted = formatted.replace(/```(\w*)\n?([\s\S]*?)```/g, (m, lang, code) => {
+                return `<pre><code>${escapeHtml(code.trim())}</code></pre>`;
+            });
+            formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
+            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+            formatted = formatted.replace(/\n\n/g, '</p><p>');
+            formatted = formatted.replace(/\n/g, '<br>');
+            return `<p>${formatted}</p>`;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('typing-indicator');
+
+            const avatar = document.createElement('div');
+            avatar.classList.add('message-avatar');
+            avatar.style.background = 'linear-gradient(135deg, #D4AF37, #C5A059)';
+            avatar.style.color = 'white';
+            avatar.style.boxShadow = '0 3px 10px rgba(212, 175, 55, 0.25)';
+            avatar.textContent = 'AI';
+
+            const dots = document.createElement('div');
+            dots.classList.add('typing-dots');
+            dots.innerHTML = '<span></span><span></span><span></span>';
+
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(dots);
+            chatMessages.appendChild(typingDiv);
+            scrollToBottom();
+            return typingDiv;
+        }
+
+        function setInputEnabled(enabled) {
+            chatInput.disabled = !enabled;
+            sendBtn.disabled = !enabled;
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+        }
+
+        // Демо-ответы (если API-ключ не задан)
+        function generateDemoResponse(userText) {
+            const lower = userText.toLowerCase();
+            if (lower.includes('привет') || lower.includes('здравствуй') || lower.includes('hello')) {
+                return 'Здравствуйте! Рад вас видеть. Я — **IncludeAI**, ваш интеллектуальный ассистент. Чем могу помочь сегодня?';
+            }
+            if (lower.includes('код') || lower.includes('code')) {
+                return 'Вот пример функции на JavaScript:\n\n```javascript\nfunction greet(name) {\n  return `Привет, ${name}! 👋`;\n}\n\nconsole.log(greet("Мир"));\n```\n\n💡 *Это демо-режим. Подключите API-ключ Hugging Face в настройках (⚙️), чтобы получить настоящие ответы от ИИ.*';
+            }
+            if (lower.includes('кто ты') || lower.includes('что ты')) {
+                return 'Я — **IncludeAI**, современный ИИ-ассистент. Сейчас я работаю в демо-режиме.\n\nЧтобы подключить реальные модели (Llama 3.3, Mistral, Qwen и др.), нажмите ⚙️ в правом верхнем углу и введите ваш API-ключ **Hugging Face**.';
+            }
+            return 'Это демо-режим работы IncludeAI. 🔑\n\nЧтобы получать настоящие ответы от ИИ, откройте настройки (⚙️) и укажите ваш API-ключ **Hugging Face**.\n\n📍 Получить ключ: https://huggingface.co/settings/tokens\n\nПосле подключения вы сможете использовать модели от Meta, Mistral, Qwen, Microsoft и других.';
+        }
+
+        // Инициализация
+        updateApiStatus();
+        chatInput.focus();
+    </script>
+</body>
+</html>
